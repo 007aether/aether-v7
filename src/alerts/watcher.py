@@ -109,4 +109,4 @@ def main():
         time.sleep(300)
 
 if __name__ == "__main__":
-    print(json.dumps(check_once(), indent=2))
+    main()

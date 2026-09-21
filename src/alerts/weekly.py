@@ -97,4 +97,4 @@ def main():
         time.sleep(600)  # كل 10 دقائق
 
 if __name__ == "__main__":
-    print(generate_report())
+    main()
