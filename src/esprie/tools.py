@@ -179,3 +179,29 @@ def run_hermes_task(prompt: str) -> str:
         return f"Hermes Error: {result.stderr.strip()}"
     except Exception as e:
         return f"Exec Exception: {str(e)}"
+
+# ═══════════ Browser Automation Tools ═══════════
+def browser_navigate(url):
+    """Navigate to a website autonomously."""
+    from src.esprie.browser_automation import navigate
+    return {"navigated": url}
+
+def browser_signup(url, email="007aether@gmail.com", password="Bbj351872@#"):
+    """Automatically signup on a website."""
+    from src.esprie.browser_automation import signup_site
+    return {"signup": signup_site(url, email, password)}
+
+def browser_login(url, email="007aether@gmail.com", password="Bbj351872@#"):
+    """Auto-login to a website."""
+    from src.esprie.browser_automation import auto_login
+    return {"login": auto_login(url, email, password)}
+
+def browser_scrape(url):
+    """Scrape data from a website."""
+    from src.esprie.browser_automation import scrape_data
+    return {"scraped": scrape_data(url)[:500]}
+
+def browser_check_site(url):
+    """Check if a site is online."""
+    from src.esprie.browser_automation import check_site_online
+    return {"online": check_site_online(url)}
