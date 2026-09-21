@@ -1,13 +1,30 @@
+# Data
 data/*.db
 data/*.db-*
 data/logs/
+
+# Python
 __pycache__/
 *.pyc
+.venv/
+venv/
+
+# Secrets
 .env
 *.session
 .bot_token
 .bot_token.old
 .telegram_chat_id
+.telegram_credentials.json
 .wallet_secrets.json
+.creds.json
+.all_credentials.enc
+
+# Backups
 *.bak
 *.old
+AETHER_backups/
+
+# OS
+.DS_Store
+Thumbs.db
