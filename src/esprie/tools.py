@@ -163,3 +163,19 @@ def call(name, *args, **kwargs):
         return TOOLS[name]["fn"](*args, **kwargs)
     except Exception as e:
         return f"err in {name}: {e}"
+
+# ==========================================
+# HERMES AGENT AUTOMATIC INTEGRATION TOOL
+# ==========================================
+import subprocess
+
+def run_hermes_task(prompt: str) -> str:
+    """إرسال مهمة تنفيذية معقدة لـ Hermes Agent للتنفيذ التلقائي"""
+    try:
+        cmd = f"hermes run \"{prompt}\" --quiet"
+        result = subprocess.run(cmd, shell=True, capture_output=True, text=True, timeout=120)
+        if result.returncode == 0:
+            return result.stdout.strip()
+        return f"Hermes Error: {result.stderr.strip()}"
+    except Exception as e:
+        return f"Exec Exception: {str(e)}"
