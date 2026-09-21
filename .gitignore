@@ -33,3 +33,8 @@ Thumbs.db
 .youtube_token.json
 .pexels_api_key
 content_output/
+
+# Encrypted Vault Files (never commit these)
+.config/aether-secrets/
+*.enc
+*.enc.old
