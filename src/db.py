@@ -60,6 +60,13 @@ CREATE TABLE IF NOT EXISTS tap_status (
     status TEXT DEFAULT 'ready',
     last_tap TEXT
 );
+CREATE TABLE IF NOT EXISTS airdrops_active (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    ts TEXT NOT NULL,
+    name TEXT,
+    chain TEXT,
+    status TEXT DEFAULT 'tracked'
+);
 CREATE INDEX IF NOT EXISTS idx_earnings_ts ON earnings(ts);
 """
 

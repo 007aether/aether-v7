@@ -45,12 +45,12 @@ for label, p in [('Memory', DB_PATH), ('Earnings', EARNINGS_DB)]:
     except Exception as e:
         print(f'✗ {label} DB: {e}')
 # Services
-for svc in ['aether-v7-daemon','aether-v7-bot','aether-v7-dashboard']:
+for svc in ['aether-v7-daemon','aether-v7-bot','aether-v7-dashboard','aether-v7-alerts']:
     r = subprocess.run(['systemctl','--user','is-active',svc], capture_output=True, text=True)
     st = r.stdout.strip()
     icon = '✓' if st == 'active' else '✗'
     print(f'{icon} {svc}: {st}')
-for svc in ['aether-v7-earner.timer','aether-v7-brain.timer']:
+for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning.timer','aether-v7-airdrops.timer','aether-v7-sync.timer']:
     r = subprocess.run(['systemctl','--user','is-active',svc], capture_output=True, text=True)
     st = r.stdout.strip()
     icon = '✓' if st == 'active' else '✗'
@@ -63,5 +63,12 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer']:
     echo "═══ Test brain ═══"; $PY -m src.brain
     echo ""; echo "═══ Test earner ═══"; $PY -m src.earner
     ;;
+  report)     exec $PY -c "from src.alerts.notifier import send_daily_report; send_daily_report()" ;;
+  testmsg)    exec $PY -c "from src.alerts.notifier import send; send('⚡ اختبار من AETHER v7')" ;;
+  sync)       exec $PY -c "from src.earnings.sync import sync; sync()" ;;
+  airdrops)   exec $PY -c "from src.airdrops.tracker import refresh; print('✓ tracked', refresh())" ;;
+  learn)      exec $PY -c "from src.learning.analyzer import analyze_cycles; import json; print(json.dumps(analyze_cycles(),indent=2,ensure_ascii=False))" ;;
+  wallet)     exec $PY -m src.wallet.manager ;;
+  tts)        exec $PY -c "from src.voice.tts import test; print(test())" ;;
   *)          echo "Usage: aether {init|migrate|status|brain|daemon|earner|bot|dashboard|health|logs <name>|restart|test}" ;;
 esac

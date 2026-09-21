@@ -6,4 +6,6 @@ __pycache__/
 .env
 *.session
 .bot_token
+.bot_token.old
 .telegram_chat_id
+.wallet_secrets.json
