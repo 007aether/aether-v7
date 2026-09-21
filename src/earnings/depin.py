@@ -13,6 +13,12 @@ PROVIDERS = {
                 "docker.io/packetstream/psclient"],
         "note": "bandwidth sharing",
     },
+    "Honeygain": {
+        "container": "honeygain",
+        "daily_usd": 0.15,  # $3-10/month
+        "cmd": None,
+        "note": "bandwidth sharing",
+    },
     "Mysterium": {
         "container": "mysterium-node",
         "daily_usd": 1.5,
