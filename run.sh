@@ -79,6 +79,11 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning
   plan)       exec $PY -m src.content.planner ;;
   plan_gen)   exec $PY -m src.content.planner generate ;;
   export)     exec $PY -m src.content.exporter "${2}" ;;
+  voice)      exec $PY -m src.video.voice "${2}" "${3:-ar}" ;;
+  thumb)      exec $PY -m src.video.thumbnail "${2}" ;;
+  video)      exec $PY -m src.video.assembler "${2}" "${3:-ar}" ;;
+  pipeline)   exec $PY -m src.video.pipeline script "${2}" "${3:-ar}" ;;
+  make)       exec $PY -m src.video.pipeline topic "${2}" "${3:-5}" "${4:-ar}" ;;
   content_run) exec $PY -m src.content.worker ;;
   scripts)    exec $PY -m src.content.generator list ;;
   show)       exec $PY -m src.content.generator show "${2}" ;;

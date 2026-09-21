@@ -61,6 +61,19 @@ load();setInterval(load,5000);
 def home():
     return render_template_string(HTML)
 
+
+def _safe_count(sql):
+    """count آمن"""
+    import sqlite3
+    from .config import DB_PATH
+    try:
+        c = sqlite3.connect(DB_PATH, timeout=5)
+        r = c.execute(sql).fetchone()
+        c.close()
+        return r[0] if r else 0
+    except Exception:
+        return 0
+
 @app.route("/api/status")
 def api():
     cm = connect_memory(); ce = connect_earnings()
