@@ -66,8 +66,10 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning
   report)     exec $PY -c "from src.alerts.notifier import send_daily_report; send_daily_report()" ;;
   testmsg)    exec $PY -c "from src.alerts.notifier import send; send('⚡ اختبار من AETHER v7')" ;;
   sync)       exec $PY -c "from src.earnings.sync import sync; sync()" ;;
+  eligibility) exec $PY -m src.airdrops.eligibility ;;
   airdrops)   exec $PY -c "from src.airdrops.tracker import refresh; print('✓ tracked', refresh())" ;;
   learn)      exec $PY -c "from src.learning.analyzer import analyze_cycles; import json; print(json.dumps(analyze_cycles(),indent=2,ensure_ascii=False))" ;;
+  portfolio)  exec $PY -m src.wallet.manager ;;
   wallet)     exec $PY -m src.wallet.manager ;;
   tts)        exec $PY -c "from src.voice.tts import test; print(test())" ;;
   *)          echo "Usage: aether {init|migrate|status|brain|daemon|earner|bot|dashboard|health|logs <name>|restart|test}" ;;
