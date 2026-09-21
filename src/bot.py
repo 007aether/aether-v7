@@ -584,6 +584,49 @@ async def cmd_watcher(u, c):
         out = f"خطأ: {e}"
     await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
 
+
+async def cmd_market(u, c):
+    if not is_admin(u): return
+    await u.message.reply_text("📈 كنفحص الأسعار...")
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from src.alerts.market import check_once; import json; print(json.dumps(check_once(), indent=2))"],
+            capture_output=True, text=True, timeout=30, cwd=str(V7),
+        )
+        out = r.stdout.strip() or "()"
+    except Exception as e:
+        out = f"خطأ: {e}"
+    await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
+
+async def cmd_weekly(u, c):
+    if not is_admin(u): return
+    await u.message.reply_text("📅 كنصاوب التقرير...")
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from src.alerts.weekly import generate_report; print(generate_report())"],
+            capture_output=True, text=True, timeout=60, cwd=str(V7),
+        )
+        out = r.stdout[:3500] or r.stderr[:1500]
+    except Exception as e:
+        out = f"خطأ: {e}"
+    await u.message.reply_text(out, parse_mode="Markdown")
+
+async def cmd_backup(u, c):
+    if not is_admin(u): return
+    await u.message.reply_text("💾 كنعمل backup...")
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from src.maintenance.backup import run; import json; print(json.dumps(run(), indent=2))"],
+            capture_output=True, text=True, timeout=60, cwd=str(V7),
+        )
+        out = r.stdout[:2000] or r.stderr[:1000]
+    except Exception as e:
+        out = f"خطأ: {e}"
+    await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
+
 def main():
     if not TOKEN:
         log.error(f"No token at {TOKEN_FILE}")
@@ -610,6 +653,9 @@ def main():
         "chains": cmd_chains,
         "gas": cmd_gas,
         "watcher": cmd_watcher,
+        "market": cmd_market,
+        "weekly": cmd_weekly,
+        "backup": cmd_backup,
     }
     for name, fn in handlers.items():
         app.add_handler(CommandHandler(name, fn))

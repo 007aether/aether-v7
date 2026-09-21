@@ -45,12 +45,12 @@ for label, p in [('Memory', DB_PATH), ('Earnings', EARNINGS_DB)]:
     except Exception as e:
         print(f'✗ {label} DB: {e}')
 # Services
-for svc in ['aether-v7-daemon','aether-v7-bot','aether-v7-dashboard','aether-v7-alerts']:
+for svc in ['aether-v7-daemon','aether-v7-bot','aether-v7-dashboard','aether-v7-alerts','aether-v7-watcher','aether-v7-market','aether-v7-weekly']:
     r = subprocess.run(['systemctl','--user','is-active',svc], capture_output=True, text=True)
     st = r.stdout.strip()
     icon = '✓' if st == 'active' else '✗'
     print(f'{icon} {svc}: {st}')
-for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning.timer','aether-v7-airdrops.timer','aether-v7-sync.timer']:
+for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning.timer','aether-v7-airdrops.timer','aether-v7-sync.timer','aether-v7-backup.timer']:
     r = subprocess.run(['systemctl','--user','is-active',svc], capture_output=True, text=True)
     st = r.stdout.strip()
     icon = '✓' if st == 'active' else '✗'
@@ -64,6 +64,9 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning
     echo ""; echo "═══ Test earner ═══"; $PY -m src.earner
     ;;
   watcher)    exec $PY -c "from src.alerts.watcher import check_once; import json; print(json.dumps(check_once(), indent=2))" ;;
+  market)     exec $PY -c "from src.alerts.market import check_once; import json; print(json.dumps(check_once(), indent=2))" ;;
+  weekly)     exec $PY -m src.alerts.weekly ;;
+  backup)     exec $PY -m src.maintenance.backup ;;
   report)     exec $PY -c "from src.alerts.notifier import send_daily_report; send_daily_report()" ;;
   testmsg)    exec $PY -c "from src.alerts.notifier import send; send('⚡ اختبار من AETHER v7')" ;;
   sync)       exec $PY -c "from src.earnings.sync import sync; sync()" ;;
