@@ -63,6 +63,7 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning
     echo "═══ Test brain ═══"; $PY -m src.brain
     echo ""; echo "═══ Test earner ═══"; $PY -m src.earner
     ;;
+  watcher)    exec $PY -c "from src.alerts.watcher import check_once; import json; print(json.dumps(check_once(), indent=2))" ;;
   report)     exec $PY -c "from src.alerts.notifier import send_daily_report; send_daily_report()" ;;
   testmsg)    exec $PY -c "from src.alerts.notifier import send; send('⚡ اختبار من AETHER v7')" ;;
   sync)       exec $PY -c "from src.earnings.sync import sync; sync()" ;;

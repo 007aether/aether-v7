@@ -14,6 +14,7 @@ except ImportError:
     WEB3_OK = False
 
 from . import solana as sol
+from . import pricing
 
 SECRETS = ROOT / ".wallet_secrets.json"
 ETH_RPC = "https://ethereum.publicnode.com"
@@ -51,34 +52,38 @@ def eth_balance(address, rpc=ETH_RPC):
         return None
 
 def summary(include_balance=True):
+    """Multi-chain portfolio with USD values"""
     secrets = load_secrets()
     wallets = {}
+    total_usd = 0.0
 
-    # ETH from metamask_seed
+    # ETH wallets (metamask + any 0x keys)
     mm = secrets.get("metamask_seed")
     if isinstance(mm, str) and len(mm.split()) >= 12:
         addr = eth_address_from_seed(mm)
         if addr:
+            bal = eth_balance(addr) if include_balance else None
+            usd = pricing.usd_value("ETH", bal) if bal is not None else None
             wallets["metamask_eth"] = {
-                "chain": "ethereum",
-                "source": "metamask_seed",
-                "address": addr,
-                "balance": eth_balance(addr) if include_balance else None,
-                "symbol": "ETH",
+                "chain": "ethereum", "source": "metamask_seed",
+                "address": addr, "balance": bal, "symbol": "ETH",
+                "usd": usd,
             }
+            if usd: total_usd += usd
 
-    # SOL from phantom_seed
+    # SOL wallet
     ph = secrets.get("phantom_seed")
     if isinstance(ph, str) and len(ph.split()) >= 12:
         addr = sol.address_from_seed(ph)
         if addr:
+            bal = sol.check_balance(addr) if include_balance else None
+            usd = pricing.usd_value("SOL", bal) if bal is not None else None
             wallets["phantom_sol"] = {
-                "chain": "solana",
-                "source": "phantom_seed",
-                "address": addr,
-                "balance": sol.check_balance(addr) if include_balance else None,
-                "symbol": "SOL",
+                "chain": "solana", "source": "phantom_seed",
+                "address": addr, "balance": bal, "symbol": "SOL",
+                "usd": usd,
             }
+            if usd: total_usd += usd
 
     # Additional PKs
     skip = {"metamask_seed", "phantom_seed", "telegram", "bot_token",
@@ -94,15 +99,21 @@ def summary(include_balance=True):
                 except Exception:
                     pass
             if addr:
+                bal = eth_balance(addr) if include_balance else None
+                usd = pricing.usd_value("ETH", bal) if bal is not None else None
                 wallets[f"{key}_eth"] = {
-                    "chain": "ethereum",
-                    "source": key,
-                    "address": addr,
-                    "balance": eth_balance(addr) if include_balance else None,
-                    "symbol": "ETH",
+                    "chain": "ethereum", "source": key,
+                    "address": addr, "balance": bal, "symbol": "ETH",
+                    "usd": usd,
                 }
+                if usd: total_usd += usd
 
-    return {"count": len(wallets), "wallets": wallets}
+    return {
+        "count": len(wallets),
+        "total_usd": round(total_usd, 2),
+        "wallets": wallets,
+    }
+
 
 if __name__ == "__main__":
     print(json.dumps(summary(), indent=2, ensure_ascii=False))

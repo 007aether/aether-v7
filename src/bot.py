@@ -569,6 +569,21 @@ async def cmd_gas(u, c):
         out = f"خطأ: {e}"
     await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
 
+
+async def cmd_watcher(u, c):
+    if not is_admin(u): return
+    await u.message.reply_text("🔍 كنفحص الرصيد...")
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from src.alerts.watcher import check_once; import json; print(json.dumps(check_once(), indent=2))"],
+            capture_output=True, text=True, timeout=60, cwd=str(V7),
+        )
+        out = r.stdout[:2000] or r.stderr[:1000] or "()"
+    except Exception as e:
+        out = f"خطأ: {e}"
+    await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
+
 def main():
     if not TOKEN:
         log.error(f"No token at {TOKEN_FILE}")
@@ -594,6 +609,7 @@ def main():
         "eligibility": cmd_eligibility,
         "chains": cmd_chains,
         "gas": cmd_gas,
+        "watcher": cmd_watcher,
     }
     for name, fn in handlers.items():
         app.add_handler(CommandHandler(name, fn))
