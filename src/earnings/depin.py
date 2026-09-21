@@ -1,4 +1,4 @@
-"""AETHER v9.1 — DePIN scanner (fixed container detection)"""
+"""AETHER v9.3 — DePIN scanner (docker + native services)"""
 import subprocess, json, sqlite3
 from ..config import DB_PATH
 from ..utils import now, setup_logger
@@ -7,49 +7,72 @@ log = setup_logger("depin")
 
 PROVIDERS = {
     "PacketStream": {
-        "container": "psclient",
+        "type": "docker",
+        "container": "packetstream",
         "daily_usd": 1.0,
-        "cmd": ["podman", "run", "-d", "--name", "psclient",
-                "docker.io/packetstream/psclient"],
+        "cmd": ["docker", "run", "-d", "--name", "packetstream",
+                "--restart", "unless-stopped",
+                "-e", "CID=85HJ", "packetstream/psclient"],
         "note": "bandwidth sharing",
     },
     "Honeygain": {
+        "type": "docker",
         "container": "honeygain",
-        "daily_usd": 0.15,  # $3-10/month
+        "daily_usd": 0.15,
         "cmd": None,
         "note": "bandwidth sharing",
     },
+    "EarnApp": {
+        "type": "native",
+        "services": ["earnapp"],
+        "processes": ["earnapp"],
+        "daily_usd": 0.5,
+        "cmd": None,
+        "note": "bandwidth sharing (native)",
+    },
     "Mysterium": {
-        "container": "mysterium-node",
+        "type": "native",
+        "services": ["mysterium-node"],
+        "processes": ["mysterium_server"],
         "daily_usd": 1.5,
-        "cmd": None,  # already running
-        "note": "VPN node",
+        "cmd": None,
+        "note": "VPN node (native)",
+    },
+    "Repocket": {
+        "type": "docker",
+        "container": "repocket",
+        "daily_usd": 0.5,
+        "cmd": None,
+        "note": "bandwidth sharing",
     },
     "Flux": {
+        "type": "docker",
         "container": "flux",
         "daily_usd": 5.0,
         "cmd": None,
         "note": "compute node",
     },
     "Akash": {
+        "type": "docker",
         "container": "akash",
         "daily_usd": 3.0,
         "cmd": None,
         "note": "GPU/compute marketplace",
     },
     "Nodepay": {
-        "container": "nodepay",
+        "type": "manual",
         "daily_usd": 3.0,
         "cmd": None,
         "note": "AI bandwidth (desktop)",
     },
     "Grass": {
-        "container": "grass",
+        "type": "manual",
         "daily_usd": 1.0,
         "cmd": None,
         "note": "AI scraping (extension)",
     },
 }
+
 
 def ensure_table():
     c = sqlite3.connect(DB_PATH, timeout=10)
@@ -60,8 +83,8 @@ def ensure_table():
     c.commit()
     c.close()
 
+
 def _list_containers(tool):
-    """يرجع dict {name: status}"""
     try:
         r = subprocess.run(
             [tool, "ps", "-a", "--format", "{{.Names}}|{{.Status}}"],
@@ -79,11 +102,29 @@ def _list_containers(tool):
         log.debug(f"{tool}: {e}")
         return {}
 
-def check_container(container_name):
-    """يرجع 'running' / 'stopped' / 'manual'"""
+
+def _systemctl_active(unit):
+    try:
+        r = subprocess.run(["systemctl", "is-active", unit],
+                           capture_output=True, text=True, timeout=5)
+        return r.stdout.strip() == "active"
+    except Exception:
+        return False
+
+
+def _pgrep(name):
+    try:
+        r = subprocess.run(["pgrep", "-f", name],
+                           capture_output=True, text=True, timeout=5)
+        return r.returncode == 0
+    except Exception:
+        return False
+
+
+def check_docker(container_name):
     if not container_name:
         return "manual"
-    for tool in ["podman", "docker"]:
+    for tool in ["docker", "podman"]:
         containers = _list_containers(tool)
         if containers is None:
             continue
@@ -94,6 +135,26 @@ def check_container(container_name):
             return "stopped"
     return "stopped"
 
+
+def check_native(services=None, processes=None):
+    for s in (services or []):
+        if _systemctl_active(s):
+            return "running"
+    for p in (processes or []):
+        if _pgrep(p):
+            return "running"
+    return "stopped"
+
+
+def check_provider(info):
+    t = info.get("type", "docker")
+    if t == "manual":
+        return "manual"
+    if t == "native":
+        return check_native(info.get("services"), info.get("processes"))
+    return check_docker(info.get("container"))
+
+
 def scan():
     ensure_table()
     c = sqlite3.connect(DB_PATH, timeout=10)
@@ -101,10 +162,7 @@ def scan():
     running = 0
     results = []
     for name, info in PROVIDERS.items():
-        st = check_container(info["container"]) if info["cmd"] or info["container"] else "manual"
-        # Grass/Nodepay = manual (desktop/extension)
-        if name in ("Grass", "Nodepay"):
-            st = "manual"
+        st = check_provider(info)
         if st == "running":
             running += 1
         c.execute(
@@ -121,13 +179,14 @@ def scan():
     log.info(f"DePIN scan: {running}/{len(PROVIDERS)} running, ~${total_daily}/day")
     return {
         "running": running, "total": len(PROVIDERS),
-        "estimated_daily_usd": total_daily,
+        "estimated_daily_usd": round(total_daily, 2),
         "providers": results,
     }
 
+
 def start_provider(name):
     p = PROVIDERS.get(name)
-    if not p or not p["cmd"]:
+    if not p or not p.get("cmd"):
         return False
     try:
         r = subprocess.run(p["cmd"], capture_output=True, text=True, timeout=60)
@@ -140,14 +199,15 @@ def start_provider(name):
         log.error(f"{name}: {e}")
         return False
 
+
 if __name__ == "__main__":
     import sys
     if len(sys.argv) > 1 and sys.argv[1] == "install":
         results = {}
         for n in PROVIDERS:
-            if check_container(PROVIDERS[n]["container"]) == "running":
+            if check_provider(PROVIDERS[n]) == "running":
                 results[n] = "already running"
-            elif PROVIDERS[n]["cmd"]:
+            elif PROVIDERS[n].get("cmd"):
                 results[n] = "started" if start_provider(n) else "failed"
             else:
                 results[n] = "manual"
