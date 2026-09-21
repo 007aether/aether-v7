@@ -70,6 +70,8 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning
   airdrops)   exec $PY -c "from src.airdrops.tracker import refresh; print('✓ tracked', refresh())" ;;
   learn)      exec $PY -c "from src.learning.analyzer import analyze_cycles; import json; print(json.dumps(analyze_cycles(),indent=2,ensure_ascii=False))" ;;
   portfolio)  exec $PY -m src.wallet.manager ;;
+  chains)     exec $PY -m src.wallet.chains ;;
+  gas)        exec $PY -m src.wallet.gas ;;
   wallet)     exec $PY -m src.wallet.manager ;;
   tts)        exec $PY -c "from src.voice.tts import test; print(test())" ;;
   *)          echo "Usage: aether {init|migrate|status|brain|daemon|earner|bot|dashboard|health|logs <name>|restart|test}" ;;

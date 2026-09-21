@@ -539,6 +539,36 @@ async def cmd_eligibility(u, c):
         out = f"خطأ: {e}"
     await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
 
+
+# ═══════════════════════════ v7.3 ADDITIONS ═══════════════════════════
+async def cmd_chains(u, c):
+    if not is_admin(u): return
+    await u.message.reply_text("🌐 كنفحص 9 شبكات...")
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from src.wallet.chains import check_all_chains; from src.wallet.manager import eth_address_from_seed; from src.wallet import solana as sol; from src.config import ROOT; import json; d=json.loads((ROOT/'.wallet_secrets.json').read_text()); eth=eth_address_from_seed(d.get('metamask_seed','')); sa=sol.address_from_seed(d.get('phantom_seed','')); print(json.dumps(check_all_chains(eth, sa), indent=2, ensure_ascii=False))"],
+            capture_output=True, text=True, timeout=60, cwd=str(V7),
+        )
+        out = r.stdout[:3500] or r.stderr[:2000]
+    except Exception as e:
+        out = f"خطأ: {e}"
+    await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
+
+async def cmd_gas(u, c):
+    if not is_admin(u): return
+    await u.message.reply_text("⛽ كنفحص الـ gas...")
+    try:
+        r = subprocess.run(
+            [sys.executable, "-c",
+             "from src.wallet.gas import all_gas, cheapest; import json; print(json.dumps({'all': all_gas(), 'cheapest': cheapest()}, indent=2))"],
+            capture_output=True, text=True, timeout=60, cwd=str(V7),
+        )
+        out = r.stdout[:3500] or r.stderr[:2000]
+    except Exception as e:
+        out = f"خطأ: {e}"
+    await u.message.reply_text(f"```\n{out}\n```", parse_mode="Markdown")
+
 def main():
     if not TOKEN:
         log.error(f"No token at {TOKEN_FILE}")
@@ -562,6 +592,8 @@ def main():
         "logs": cmd_logs, "testmsg": cmd_testmsg, "speak": cmd_speak,
         "portfolio": cmd_portfolio,
         "eligibility": cmd_eligibility,
+        "chains": cmd_chains,
+        "gas": cmd_gas,
     }
     for name, fn in handlers.items():
         app.add_handler(CommandHandler(name, fn))
