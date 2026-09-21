@@ -38,8 +38,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         "🧠 *AI: Ollama + qwen3*\n"
         "🌐 *Browser: Firefox + Selenium*\n"
         "📡 *Telegram Bot: Connected*\n\n"
-        "_*Commands:*_
-"
+        "_*Commands:*_\n"
         "• `/ask <message>` — Ask ESPRIEAETHER\n"
         "• `/hermes` — Full Hermes agent mode\n"
         "• `/status` — System status\n"
@@ -77,12 +76,12 @@ async def cmd_admin(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         "🔒 *Admin Panel*\n\n"
         "Send your password to access admin controls.\n\n"
-        "*Commands:*
-- `/admin start` — Start all services
-- `/admin stop` — Stop all services
-- `/admin status` — Full system status
-- `/admin restart` — Restart all services
-- `/autonomous on/off` — Toggle 24/7 mode"
+        "*Commands:*\n"
+        "- `/admin start` — Start all services\n"
+        "- `/admin stop` — Stop all services\n"
+        "- `/admin status` — Full system status\n"
+        "- `/admin restart` — Restart all services\n"
+        "- `/autonomous on/off` — Toggle 24/7 mode\n"
     )
 
 async def cmd_status(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -121,23 +120,24 @@ async def cmd_help(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Help menu."""
     await update.message.reply_text(
         "📖 *Help — ESPRIEAETHER Bot*\n\n"
-        "*General:*
-/start → Welcome
-/help → This message
-/ask → Ask AI anything
-/hermes → Bash execution mode\n\n"
-        "*System:*
-/status → All services
-/autonomous → Toggle 24/7
-/admin → Admin panel\n\n"
-        "*Autonomous (24/7):*
-• Scans airdrops automatically
-• Monitors GitHub repos
-• Scrapes websites\n"
+        "*General:*\n"
+        "/start → Welcome\n"
+        "/help → This message\n"
+        "/ask → Ask AI anything\n"
+        "/hermes → Bash execution mode\n\n"
+        "*System:*\n"
+        "/status → All services\n"
+        "/autonomous → Toggle 24/7\n"
+        "/admin → Admin panel\n\n"
+        "*Autonomous (24/7):*\n"
+        "• Scans airdrops automatically\n"
+        "• Monitors GitHub repos\n"
+        "• Scrapes websites\n"
         "• Browser automation tasks\n"
         "• Service health checks\n"
-        "• Telegram bot monitoring"
-    , parse_mode="Markdown")
+        "• Telegram bot monitoring\n",
+        parse_mode="Markdown"
+    )
 
 async def admin_auth(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Admin password check."""
