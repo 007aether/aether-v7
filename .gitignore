@@ -29,3 +29,7 @@ AETHER_backups/
 .DS_Store
 Thumbs.db
 .pexels_api_key
+.youtube_client_secret.json
+.youtube_token.json
+.pexels_api_key
+content_output/
