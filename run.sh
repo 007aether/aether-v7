@@ -50,7 +50,7 @@ for svc in ['aether-v7-daemon','aether-v7-bot','aether-v7-dashboard','aether-v7-
     st = r.stdout.strip()
     icon = '✓' if st == 'active' else '✗'
     print(f'{icon} {svc}: {st}')
-for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning.timer','aether-v7-airdrops.timer','aether-v7-sync.timer','aether-v7-backup.timer']:
+for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning.timer','aether-v7-airdrops.timer','aether-v7-sync.timer','aether-v7-backup.timer','aether-v7-depin.timer','aether-v7-paper.timer']:
     r = subprocess.run(['systemctl','--user','is-active',svc], capture_output=True, text=True)
     st = r.stdout.strip()
     icon = '✓' if st == 'active' else '✗'
@@ -69,6 +69,14 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning
   backup)     exec $PY -m src.maintenance.backup ;;
   report)     exec $PY -c "from src.alerts.notifier import send_daily_report; send_daily_report()" ;;
   testmsg)    exec $PY -c "from src.alerts.notifier import send; send('⚡ اختبار من AETHER v7')" ;;
+  depin)      exec $PY -m src.earnings.depin ;;
+  depin_install) exec $PY -m src.earnings.depin install ;;
+  paper)      exec $PY -m src.trading.hyperliquid_paper portfolio ;;
+  paper_price) exec $PY -m src.trading.hyperliquid_paper price "${2:-BTC}" ;;
+  paper_open) exec $PY -m src.trading.hyperliquid_paper open "${2:-BTC}" "${3:-buy}" "${4:-100}" ;;
+  paper_close) exec $PY -m src.trading.hyperliquid_paper close "${2:-1}" ;;
+  niches)     exec $PY -m src.content.youtube_niche ;;
+  niche)      exec $PY -m src.content.youtube_niche "${2:-ai_tools}" ;;
   sync)       exec $PY -c "from src.earnings.sync import sync; sync()" ;;
   eligibility) exec $PY -m src.airdrops.eligibility ;;
   airdrops)   exec $PY -c "from src.airdrops.tracker import refresh; print('✓ tracked', refresh())" ;;

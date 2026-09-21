@@ -12,7 +12,7 @@ def ask(prompt, system="أنت AETHER، عقل رقمي مغربي. تفهم ا�
             OLLAMA_URL,
             json={"model": OLLAMA_MODEL, "system": system,
                   "prompt": prompt, "stream": False},
-            timeout=90,
+            timeout=180,
         )
         if r.status_code == 200:
             return r.json().get("response", "").strip()
