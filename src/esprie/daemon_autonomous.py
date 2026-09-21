@@ -17,6 +17,7 @@ import logging
 import threading
 from datetime import datetime, timedelta
 from pathlib import Path
+import subprocess
 
 sys.path.insert(0, '/home/aether/AETHER_Project/aether-v7')
 from src.esprie.core import TOOL_LIST
