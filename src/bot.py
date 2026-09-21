@@ -58,8 +58,8 @@ async def cmd_ask(update: Update, context: ContextTypes.DEFAULT_TYPE):
     
     await update.message.reply_text("🧠 Thinking...")
     try:
-        from src.brain import think
-        response = think(prompt=text, system_prompt="You are ESPRIEAETHER v3.0, an autonomous Moroccan AI agent. Answer in Darija Arabic or English.")
+        from src.brain import ask
+        response = ask(text, system="You are ESPRIEAETHER v3.0, an autonomous Moroccan AI agent. Answer in Darija Arabic or English.")
         # Split long responses
         chunks = [response[i:i+4000] for i in range(0, len(response), 4000)]
         for chunk in chunks:
@@ -162,8 +162,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if AUTONOMOUS_MODE:
         await update.message.reply_text("🧠 Processing autonomously...")
         try:
-            from src.brain import think
-            response = think(prompt=text, system_prompt="You are ESPRIEAETHER v3.0, autonomous agent. Answer in Darija.")
+            from src.brain import ask
+            response = ask(text, system="You are ESPRIEAETHER v3.0, autonomous agent. Answer in Darija.")
             await update.message.reply_text(response[:4000], parse_mode="Markdown")
         except Exception as e:
             await update.message.reply_text(f"⚠️ {str(e)}")
