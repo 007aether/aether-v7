@@ -73,10 +73,10 @@ CONTENT <رقم>: <فقرة كاملة 3-4 جمل>
             continue
         up = line.upper()
         if up.startswith("HEADING"):
-            head = re.sub(r"^HEADING\s*\d*\s*[:：\-]\s*", "", line, flags=re.IGNORECASE).strip()
+            head = re.sub(r"^HEADING\s*[<\d>]*\s*[:：\-]?\s*", "", line, flags=re.IGNORECASE).strip()
             current_head = head
         elif up.startswith("CONTENT"):
-            content = re.sub(r"^CONTENT\s*\d*\s*[:：\-]\s*", "", line, flags=re.IGNORECASE).strip()
+            content = re.sub(r"^CONTENT\s*[<\d>]*\s*[:：\-]?\s*", "", line, flags=re.IGNORECASE).strip()
             if current_head:
                 sections.append({"heading": current_head, "content": content})
                 current_head = None

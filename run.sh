@@ -76,6 +76,10 @@ for svc in ['aether-v7-earner.timer','aether-v7-brain.timer','aether-v7-learning
   paper_open) exec $PY -m src.trading.hyperliquid_paper open "${2:-BTC}" "${3:-buy}" "${4:-100}" ;;
   paper_close) exec $PY -m src.trading.hyperliquid_paper close "${2:-1}" ;;
   generate)   exec $PY -m src.content.generator generate "${2:-5 AI tools}" "${3:-5}" "${4:-ar}" ;;
+  plan)       exec $PY -m src.content.planner ;;
+  plan_gen)   exec $PY -m src.content.planner generate ;;
+  export)     exec $PY -m src.content.exporter "${2}" ;;
+  content_run) exec $PY -m src.content.worker ;;
   scripts)    exec $PY -m src.content.generator list ;;
   show)       exec $PY -m src.content.generator show "${2}" ;;
   niches)     exec $PY -m src.content.youtube_niche ;;
